@@ -1,0 +1,41 @@
+; version.dll（载体壳）的导出表 —— 17 个导出**全部是真实函数**（不是转发器）
+;
+; 函数体在 thunks.cpp：每个导出都是一句裸跳板 `jmp dword ptr [槽]`；
+; 槽在 DllMain 里由 LoadLibraryExA("version.dll", LOAD_LIBRARY_SEARCH_SYSTEM32) +
+; GetProcAddress 填上（见 dllmain.cpp）。
+;
+; ⚠️ 曾经用的是 .def 转发器（`X = C:\windows\system32\version.X`），**已被证伪并废弃**：
+; Wine 的默认加载序是 `native,builtin`，本地那份加载失败会**静默回退内置版**；
+; 而转发目标里的 `system32` 在 win64 prefix 下是 64 位目录，32 位进程要靠 WOW64
+; 重定向才能落到 syswow64 —— Proton 那条链没做，于是整个壳加载失败、游戏照跑、日志没有。
+; 详见 src/carrier/dllmain.cpp 头部注释。
+;
+; 这里写**裸导出名**（不写 `= 内部符号`）：函数是 extern "C"（cdecl，内部符号 `_名字`），
+; 链接器会自动匹配 cdecl 修饰形式。（曾试过写 `名字 = _前缀名` 的别名形式，link.exe 报
+; LNK2001 找不到符号，即使该符号确实在 obj 里 —— 别走那条路。）
+;
+; 名字清单来源：真实 Windows 的 C:\Windows\SysWOW64\version.dll 导出表（32 位那份）。
+; 复核命令（Windows 盘挂在 /mnt/Windows-SSD 时）：
+;   llvm-readobj --coff-exports /mnt/Windows-SSD/Windows/SysWOW64/version.dll \
+;     | grep -E '^\s+Name: ' | awk '{print $2}' | sort
+
+LIBRARY version
+
+EXPORTS
+    GetFileVersionInfoA
+    GetFileVersionInfoW
+    GetFileVersionInfoExA
+    GetFileVersionInfoExW
+    GetFileVersionInfoByHandle
+    GetFileVersionInfoSizeA
+    GetFileVersionInfoSizeW
+    GetFileVersionInfoSizeExA
+    GetFileVersionInfoSizeExW
+    VerFindFileA
+    VerFindFileW
+    VerInstallFileA
+    VerInstallFileW
+    VerLanguageNameA
+    VerLanguageNameW
+    VerQueryValueA
+    VerQueryValueW

@@ -1,0 +1,11 @@
+; RA2YRLWResourceReader.dll 的导出表
+;
+; 只用 .def 指定导出名，**不要**再配 __declspec(dllexport)（同符号两处会 LNK4197）。
+; 用 .def 的原因是：函数是 extern "C" __cdecl，内部符号是 _RA2YRLWResourceReader_Initialize，
+; 而我们要导出的名字是不带下划线的 —— .def 的 `EXPORTS 名字` 能自动匹配到 _名字。
+
+LIBRARY RA2YRLWResourceReader
+
+EXPORTS
+    RA2YRLWResourceReader_Initialize
+    RA2YRLWResourceReader_Diagnose

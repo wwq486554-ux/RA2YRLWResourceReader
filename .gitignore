@@ -1,0 +1,12 @@
+# 构建产物（DLL 挂在 GitHub Release 上，不进版本库）
+/build/
+*.obj
+*.pdb
+*.exp
+*.lib
+
+# —— 以下是本机开发用、**不随发行仓库发布**的东西 ——
+# 离线自检工具 / 探针 / 冒烟宿主：作者本机保留，仓库里不放（用户 2026-10-06 决定"只放产品源码"）
+/tools/
+/src/harness/
+/scripts/smoketest.sh
