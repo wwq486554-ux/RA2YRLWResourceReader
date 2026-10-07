@@ -23,21 +23,24 @@
 | 装法 | 要放什么 | 前提 | 启动项 |
 |---|---|---|---|
 | **① Syringe 路（推荐）** | `RA2YRLWResourceReader.dll` + `RA2YRLWResourceReader.ini` | 游戏目录里有 `SyringeEx.exe`（不少整合包会自带这个注入器） | **不用改** |
-| ② 载体壳路 | 上面两个 + `version.dll` | 没有注入器 | Proton 下要加 `version=n,b`（见下节） |
+| ② 载体壳路 | 上面两个 + `version.dll` | 没有注入器 | **仅 GNU/Linux（Steam/Proton、Wine）**：要加 `version=n,b`（见下节）。Windows 不用改 |
 
 两条路共用同一份真身、同一个工作体，**同时装上也不会重复注册**（内部一次性闸门）。
 判据：`RA2YRLWResourceReader.log` 里那行 `Bootstrap 已成功返回（触发者：…）` ——
 `Syringe hook 表（.syhks00）` = 走了第①条，`载体路：Bootstrap 入口 detour（0x5301A0）` = 走了第②条。
 
-## ⚠️（仅载体壳路）Proton / Steam 用户必须改一行启动项
+## ⚠️（仅"载体壳路" + GNU/Linux）启动项要改一行
 
-Proton 的 Wine 对系统 DLL **默认走内置版**（正因如此它的脚本才要特意声明
-`ddraw=n,b`、`winmm=n,b`、`dinput=n,b`）。`version` 不在那份名单里，
+> **这一节只针对 GNU/Linux 上通过 Steam/Proton 或 Wine 运行的情况。**
+> **Windows 用户（包括用 Steam 启动的）不需要改任何启动项**，放文件即可。
+
+在 GNU/Linux 下，Proton/Wine 对系统 DLL **默认走内置版**（正因如此 Proton 的脚本才要
+特意声明 `ddraw=n,b`、`winmm=n,b`、`dinput=n,b`）。`version` 不在那份名单里，
 所以放在游戏目录的载体壳**会被忽略**，且**没有任何报错**（Wine 的 `native,builtin`
 顺序会静默回退内置版，游戏照常运行）。
 
-**用第①条（Syringe 路）就完全不用碰启动项。** 如果确实要用载体壳，
-Steam 启动项（`%command%` 之前）必须让 version 走 native：
+**用第①条（Syringe 路）就完全不用碰启动项**（Windows 和 GNU/Linux 都一样）。
+如果确实要用载体壳，**在 GNU/Linux 下**启动项（`%command%` 之前）必须让 version 走 native：
 
 ```
 PROTON_USE_WINE3D=1 WINEDLLOVERRIDES="version=n,b;wsock32,ddraw=n,b" %command%
@@ -198,12 +201,9 @@ SyringeEx 认 DLL 的唯一条件是 `.syhks00` 段；认到就 `Recognized DLL`
 - **推荐（Syringe 路：游戏目录里已经有 `SyringeEx.exe` 的环境）**：
   把 `RA2YRLWResourceReader.dll` + `RA2YRLWResourceReader.ini` 两个文件复制到**游戏根目录**
   （与 `gamemd.exe` 同级），其他什么都不用动 —— **不用改启动项、不用载体壳**。
-- **载体壳路（游戏目录里没有 SyringeEx 时）**：再多放一个 `version.dll`，
-  并按上面那节给 Proton / Steam 加启动项。注意 `version.dll` 借的是系统 DLL 的名字，
-  同一目录只能有一个，别和别的 cnc-ddraw 类补丁的 `version.dll` 混用。
-- ⚠️ **如果之前装过别的版本**（例如旧名 `MixReader.dll`），先把旧文件删干净：
-  SyringeEx 是按 `.syhks00` 段识别的，**两个真身同时存在会双双加载**，导致包注册两次、
-  字符串表合并两次。
+- **载体壳路（游戏目录里没有 SyringeEx 时）**：再多放一个 `version.dll`；
+  **仅 GNU/Linux（Steam/Proton、Wine）**还要按上一节加 `version=n,b`。注意 `version.dll`
+  借的是系统 DLL 的名字，同一目录只能有一个，别和别的 cnc-ddraw 类补丁的 `version.dll` 混用。
 - 排错看游戏根目录的 `RA2YRLWResourceReader.log`（每次启动重建）；载体壳路另有一份
   `RA2YRLWResourceReader.carrier.log`（真身没被加载起来时，只有这份能说明问题）。
 
