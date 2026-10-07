@@ -79,9 +79,6 @@ RA2YRLWResourceReader/
 └─ README.md
 ```
 
-> 作者本机还留着一批**不随仓库发布**的开发/验证设施：离线自检工具（`tools/check_packs.py`、
-> `tools/check_sites.py`、`tools/winreg_known_dlls.py`）、Syringe hook 探针（`tools/probe_hook/`）、
-> 冒烟宿主（`src/harness/` + `scripts/smoketest.sh`）。`build.sh` 检测到宿主不存在会自动跳过那一步。
 
 ## 构建
 
